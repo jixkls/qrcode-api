@@ -10,7 +10,7 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
     res.send("Tamo on papai");
-})
+});
 
 app.post("/qrcode", async (req, res) => {
     const { content } = req.body;
@@ -31,6 +31,24 @@ app.post("/qrcode", async (req, res) => {
         res.status(500).json({error: "Erro ao gerar o QRCode"});
     }
 
+});
+
+app.post("/qrcode/download", async (req, res) => {
+    const { content, size = 300 } = req.body;
+
+    try{
+        const buffer = await QRCode.toBuffer(content, {
+            width: size,
+            type: "png"
+        })
+
+        res.setHeader("content-type", "image/png");
+        res.setHeader("Content-Diposition", "attachment; filename=qrcode.");
+        res.send(buffer);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({error: "Erro ao gerar o QRCode"});
+    }
 });
 
 const PORT = 3000;
